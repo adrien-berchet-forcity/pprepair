@@ -108,6 +108,9 @@ bool IOWorker::addToTriangulation(Triangulation &triangulation, TaggingVector &e
         case wkbPolygon25D: {
 					OGRPolygon *geometry = static_cast<OGRPolygon *>(feature->GetGeometryRef());
 					outerRingsList.push_back(std::list<Point>());
+
+          // Transform 4 nodes polygons to 5 or more nodes polygons
+          if (geometry->getExteriorRing()->getNumPoints()==4) geometry->segmentize(geometry->getExteriorRing()->get_Length()/4.0);
 					
 					// Get outer ring
 					for (int currentPoint = 0; currentPoint < geometry->getExteriorRing()->getNumPoints(); currentPoint++)
@@ -132,6 +135,8 @@ bool IOWorker::addToTriangulation(Triangulation &triangulation, TaggingVector &e
 					// Check each polygon
 					for (int currentPolygon = 0; currentPolygon < geometry->getNumGeometries(); currentPolygon++) {
 						OGRPolygon *thisGeometry = static_cast<OGRPolygon *>(geometry->getGeometryRef(currentPolygon));
+            // Transform 4 nodes polygons to 5 or more nodes polygons
+            if (thisGeometry->getExteriorRing()->getNumPoints()==4) thisGeometry->segmentize(thisGeometry->getExteriorRing()->get_Length()/4.0);
 						outerRingsList.push_back(std::list<Point>());
 						
 						// Get outer ring
